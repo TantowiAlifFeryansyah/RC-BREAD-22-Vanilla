@@ -3,6 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { MongoClient } = require('mongodb');
+const cors = require('cors') // membuka block untuk FE
 
 async function main() {
     // Connection URL
@@ -28,6 +29,7 @@ main().then((db) => {
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
+    app.use(cors())
 
     app.use('/', indexRouter);
     app.use('/users', usersRouter);

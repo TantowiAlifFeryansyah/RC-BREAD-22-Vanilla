@@ -18,8 +18,24 @@ module.exports = function (db) {
   // ADD
   router.post('/', async function (req, res, next) {
     try {
-      const result = await User.insertOne(req.body)
+      const result = await User.insertOne({
+        string: req.body.string,
+        integer: Number(req.body.integer),
+        float: parseFloat(req.body.float),
+        date: new Date(req.body.date),
+        boolean: JSON.parse(req.body.boolean)
+      })
       const user = await User.findOne({ _id: ObjectId(result.insertedId) })
+      res.json(user)
+    } catch (err) {
+      res.json({ err })
+    }
+  });
+
+  // Router EDIT
+  router.get('/:id', async function (req, res, next) {
+    try {
+      const user = await User.findOne({_id: ObjectId(req.params.id)})
       res.json(user)
     } catch (err) {
       res.json({ err })
@@ -33,8 +49,11 @@ module.exports = function (db) {
         _id: ObjectId(req.params.id)
       }, {
         $set: {
-          name: req.body.name,
-          address: req.body.address
+          string: req.body.string,
+          integer: Number(req.body.integer),
+          float: parseFloat(req.body.float),
+          date: new Date(req.body.date),
+          boolean: JSON.parse(req.body.boolean)
         }
       }, {
         returnOriginal: false
