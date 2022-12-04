@@ -147,7 +147,7 @@
 
         <div class="card-body">
           <form id="user-form">
-            <input type="hidden" id="idPost" value="">
+            <input type="hidden" id="idPost" value="" />
             <div class="row mb-3">
               <label for="string" class="col-sm-2 col-form-label">String</label>
               <div class="col-sm-10">
@@ -238,17 +238,7 @@
           </table>
 
           <nav aria-label="Page navigation example">
-            <ul class="pagination">
-              <li class="page-item">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-              </li>
-            </ul>
+            <ul class="pagination" id="userPagination"></ul>
           </nav>
         </div>
       </div>
@@ -256,8 +246,9 @@
 
     <script>
       document
-        .getElementById("user-form").addEventListener("submit", function (event) {
-          event.preventDefault()
+        .getElementById("user-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
           const id = document.getElementById("idPost").value;
           const string = document.getElementById("stringPost").value;
           const integer = document.getElementById("integerPost").value;
@@ -267,23 +258,6 @@
           saveData(id, string, integer, float, date, boolean);
         });
 
-        // Menampilkan data yang mau di EDIT ke list / form
-      const editData = (id) => {
-        fetch(`http://localhost:3000/users/${id}`)
-          .then((response) => response.json())
-          .then((data) => {
-            document.getElementById("idPost").value = data._id
-            document.getElementById("stringPost").value = data.string
-            document.getElementById("integerPost").value = data.integer
-            document.getElementById("floatPost").value = data.float
-            document.getElementById("datePost").value = data.date
-            document.getElementById("booleanPost").value = data.boolean
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
-      };
-
       // menampilkan list
       const readData = () => {
         // diambil dari alamat BEMongoDb
@@ -291,6 +265,7 @@
           .then((response) => response.json())
           .then((data) => {
             let html = "";
+
             data.forEach((item, index) => {
               html += `
                       <tr>
@@ -298,15 +273,15 @@
                       <td> ${item.string} </td>
                       <td> ${item.integer} </td>
                       <td> ${item.float} </td>
-                      <td> ${item.date} </td>
+                      <td> ${moment(item.date).format("DD MMMM YYYY")} </td>
                       <td> ${item.boolean} </td>
                       <td>
                         <button type="button" class="btn btn-success" onclick="editData('${
                           item._id
                         }')">
                             <i class="fa-solid fa-pen-to-square" onclick="editData('${
-                          item._id
-                        }')"></i> Edit
+                              item._id
+                            }')"></i> Edit
                             </button>
                         <button type="button" class="btn btn-danger" onclick="removeData('${
                           item._id
@@ -318,24 +293,59 @@
                       `;
             });
             document.getElementById("users-body").innerHTML = html;
+            pagination();
+          });
+      };
+
+      // pagination
+      const pagination = () => {
+        let li = `
+         <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+         <li class="page-item"><a class="page-link" href="#">1</a></li>
+         <li class="page-item"><a class="page-link" href="#">2</a></li>
+         <li class="page-item"><a class="page-link" href="#">3</a></li>
+         <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        `
+
+        document.getElementById("userPagination").innerHTML = li;
+      };
+
+      // Menampilkan data yang mau di EDIT ke list / form
+      const editData = (id) => {
+        fetch(`http://localhost:3000/users/${id}`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("idPost").value = data._id;
+            document.getElementById("stringPost").value = data.string;
+            document.getElementById("integerPost").value = data.integer;
+            document.getElementById("floatPost").value = data.float;
+            document.getElementById("datePost").value = moment(
+              data.date
+            ).format("YYYY-MM-DD");
+            document.getElementById("booleanPost").value = data.boolean;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
           });
       };
 
       // Add & Edit
       const saveData = (id, string, integer, float, date, boolean) => {
-        let url = `http://localhost:3000/users`
-        let method = `POST`
-        if(id){
-          url = `http://localhost:3000/users/${id}`
-          method = `PUT`
-        } 
+        let url = `http://localhost:3000/users`;
+        let method = `POST`;
+        if (id) {
+          url = `http://localhost:3000/users/${id}`;
+          method = `PUT`;
+        }
         fetch(url, {
           method: method,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ string, integer, float, date, boolean }),
-        }).then((response) => response.json()).then((data) => {
+        })
+          .then((response) => response.json())
+          .then((data) => {
             document.getElementById("idPost").value = "";
             document.getElementById("stringPost").value = "";
             document.getElementById("integerPost").value = "";
@@ -343,7 +353,8 @@
             document.getElementById("datePost").value = "";
             document.getElementById("booleanPost").value = "";
             readData();
-          }).catch((error) => {
+          })
+          .catch((error) => {
             console.error("Error:", error);
           });
       };
