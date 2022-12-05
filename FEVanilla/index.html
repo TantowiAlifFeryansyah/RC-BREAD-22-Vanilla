@@ -258,18 +258,27 @@
           saveData(id, string, integer, float, date, boolean);
         });
 
-      // menampilkan list
-      const readData = () => {
-        // diambil dari alamat BEMongoDb
-        fetch("http://localhost:3000/users")
-          .then((response) => response.json())
-          .then((data) => {
-            let html = "";
+      var params = {};
 
+      const changePage = (page) => {
+        params = { ...params, page };
+        readData(params);
+        return false;
+      };
+
+      // menampilkan list
+      const readData = (params) => {
+        // diambil dari alamat BEMongoDb
+        fetch(`http://localhost:3000/users?${new URLSearchParams(params).toString()}`)
+          .then((response) => response.json())
+          .then(({ data, page, totalPages, offset, sorting }) => {
+            params = { ...params, page, totalPages, offset, sorting };
+            // console.log(params);
+            let html = "";
             data.forEach((item, index) => {
               html += `
                       <tr>
-                      <td> ${index + 1} </td>
+                      <td> ${index + 1 + offset} </td>
                       <td> ${item.string} </td>
                       <td> ${item.integer} </td>
                       <td> ${item.float} </td>
@@ -293,20 +302,35 @@
                       `;
             });
             document.getElementById("users-body").innerHTML = html;
-            pagination();
+            pagination(params);
           });
       };
 
       // pagination
-      const pagination = () => {
+      const pagination = (params) => {
         let li = `
-         <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-         <li class="page-item"><a class="page-link" href="#">1</a></li>
-         <li class="page-item"><a class="page-link" href="#">2</a></li>
-         <li class="page-item"><a class="page-link" href="#">3</a></li>
-         <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        `
+        
+      <li class="page-item  ${params.page == 1 ? "disabled" : ""}">
+          <a class="page-link" href="javascript:void(0)" onclick="changePage(${
+            params.page - 1
+          })">Previous</a>
+      </li>`;
 
+        for (let i = 1; i <= params.totalPages; i++) {
+          li += `
+        <li class="page-item  ${i == params.page ? "active" : ""}">
+          <a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i}</a>
+        </li>`;
+        }
+
+        li += `
+      <li class="page-item ${
+        params.page == params.totalPage ? "disabled" : ""
+      }">
+          <a class="page-link" href="javascript:void(0)" onclick="changePage(${
+            params.page + 1
+          })">Next</a>
+      </li>`;
         document.getElementById("userPagination").innerHTML = li;
       };
 

@@ -8,8 +8,53 @@ module.exports = function (db) {
 
   router.get('/', async function (req, res, next) {
     try {
-      const users = await User.find().toArray()
-      res.json(users)
+
+// SEARCHING
+      const wheres = {}
+
+      if (req.query.string && req.query.stringcheck) {
+        wheres['string'] = new RegExp(`${req.query.string}`, 'i')
+      }
+
+      if (req.query.integer && req.query.integercheck) {
+        wheres['integer'] = parseInt(`${req.query.integer}`)
+      }
+
+      if (req.query.float && req.query.floatcheck) {
+        wheres['float'] = parseFloat(`${req.query.float}`)
+      }
+
+      if (req.query.datecheck) {
+        if (req.query.startdate != '' && req.query.enddate != '') {
+          wheres['date'] = {
+            $gte: new Date(`${req.query.startdate}`), 
+            $lte: new Date(`${req.query.enddate}`)
+          }
+        } else if (req.query.startdate != '') {
+          wheres['date'] = { $gte: new Date(`${req.query.startdate}`) };
+        } else if (req.query.enddate != '') {
+          wheres['date'] = { $lte: new Date(`${req.query.enddate}`) };
+        }
+      }
+
+      if (req.query.boolean && req.query.booleancheck) {
+        wheres['boolean'] = JSON.parse(`${req.query.boolean}`)
+      }
+      const page = req.query.page || 1;
+      const limit = 3;
+      const offset = (parseInt(page) - 1) * limit
+
+      const sorting = {}
+      const sortBY = req.query.sortBy || '_id'
+      const sortMode = req.query.sortMode || 'asc'
+      sorting[sortBY] = sortMode == 'asc' ? 1 : -1
+
+      const result = await User.find(wheres).toArray()
+      var total = result.length
+      const totalPages = Math.ceil(total / limit)
+
+     const users = await User.find(wheres).skip(offset).limit(limit).sort(sorting).toArray()
+      res.json({data: users, page: parseInt(page), totalPages: parseInt(totalPages), offset, total, sorting: sorting})
     } catch (err) {
       res.json({ err })
     }
