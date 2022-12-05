@@ -273,7 +273,6 @@
           .then((response) => response.json())
           .then(({ data, page, totalPages, offset, sorting }) => {
             params = { ...params, page, totalPages, offset, sorting };
-            // console.log(params);
             let html = "";
             data.forEach((item, index) => {
               html += `
