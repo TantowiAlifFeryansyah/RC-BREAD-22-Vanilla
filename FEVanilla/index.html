@@ -41,7 +41,7 @@
 
             <div class="row mb-3">
               <label for="stringcheck" class="col-sm-2 col-form-label">
-                <input type="checkbox" name="stringcheck" id="stringcheck" /> String
+                <input type="checkbox" name="stringcheck" id="stringcheck"/> String
               </label>
               <div class="col-sm-10">
                 <input
@@ -60,7 +60,7 @@
                   type="checkbox"
                   name="integercheck"
                   id="integercheck"
-                />Integer
+                /> Integer
               </label>
               <div class="col-sm-10">
                 <input
@@ -88,7 +88,7 @@
               </div>
             </div>
 
-            <div class="row mb-1">
+            <div class="row mb-3">
               <label for="datecheck" class="col-sm-2 col-form-label">
                 <input type="checkbox" name="datecheck" id="datecheck" /> Date
               </label>
@@ -96,24 +96,16 @@
                 <input
                   type="date"
                   class="form-control"
-                  id="date"
+                  id="startdate"
                   name="startdate"
-                  placeholder="Start Date"
                 />
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <label for="datecheck" class="col-sm-2 col-form-label"></label>
-              <div class="col-sm-3">
-                <label class="col mb-1">to</label>
+                <span> to </span>
                 <input
-                  type="date"
-                  class="form-control"
-                  id="date"
-                  name="enddate"
-                  placeholder="End Date"
-                />
+                type="date"
+                class="form-control"
+                id="enddate"
+                name="enddate"
+              />
               </div>
             </div>
 
@@ -123,7 +115,7 @@
                   type="checkbox"
                   name="booleancheck"
                   id="booleancheck"
-                />Boolean
+                /> Boolean
               </label>
               <div class="col-sm-10">
                 <select name="boolean" class="form-select" id="boolean">
@@ -259,6 +251,9 @@
           const integer = document.getElementById("integer").value;
           const integercheck = document.getElementById("integercheck").value;
           const float = document.getElementById("float").value;
+          const startdate = document.getElementById("startdate").value;
+          const enddate = document.getElementById("enddate").value;
+          const datecheck = document.getElementById("datecheck").value;
           const floatcheck = document.getElementById("floatcheck").value;
           const boolean = document.getElementById("boolean").value;
           const booleancheck = document.getElementById("booleancheck").value;
@@ -270,6 +265,9 @@
             integercheck,
             float,
             floatcheck,
+            startdate,
+            enddate,
+            datecheck,
             boolean,
             booleancheck,
             page,
@@ -350,76 +348,53 @@
       const pagination = (params) => {
         let li = "";
 
-        //   let beforePages = params.page - 1;
-        //   let afterPages = params.page + 1;
-        //   let liActive;
+          let beforePages = params.page - 1;
+          let afterPages = params.page + 1;
+          let liActive;
 
-        //   if (params.page >= 1) {
-        //     li += `
-        // <li class="page-item ${params.page == 1 ? "disabled" : ""}">
-        //     <a class="page-link" href="javascript:void(0)" onclick="changePage(${
-        //       params.page - 1
-        //     })">Previous</a>
-        // </li>`;
-        //   }
-
-        //   for (let i = beforePages; i <= afterPages; i++) {
-        //     if (i > params.totalPages) {
-        //       continue;
-        //     }
-
-        //     if (i == 0) {
-        //       i = i + 1;
-        //     }
-
-        //     if (params.page == i) {
-        //       liActive = "active";
-        //     } else {
-        //       liActive = "";
-        //     }
-
-        //     li += `
-        //       <li class="page-item  ${liActive}">
-        //         <a class="page-link" href="javascript:void(0)" onclick="changePage(${
-        //           (i)
-        //         })">${i}</a>
-        //       </li>
-        //       `;
-        //   }
-
-        //   if (params.page <= params.totalPages) {
-        //     li += `
-        // <li class="page-item ${
-        //   params.page == params.totalPages ? "disabled" : ""
-        // }">
-        //     <a class="page-link" href="javascript:void(0)" onclick="changePage(${
-        //       params.page + 1
-        //     })">Next</a>
-        // </li>`;
-        //   }
-
-        li += `
-        <li class="page-item  ${params.page == 1 ? "disabled" : ""}">
+          if (params.page >= 1) {
+            li += `
+        <li class="page-item ${params.page == 1 ? "disabled" : ""}">
             <a class="page-link" href="javascript:void(0)" onclick="changePage(${
               params.page - 1
             })">Previous</a>
         </li>`;
+          }
 
-        for (let i = 1; i <= params.totalPages; i++) {
-          li += `
-          <li class="page-item  ${i == params.page ? "active" : ""}">
-            <a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i}</a>
-          </li>`;
-        }
+          for (let i = beforePages; i <= afterPages; i++) {
+            if (i > params.totalPages) {
+              continue;
+            }
 
-        li += `
+            if (i == 0) {
+              i = i + 1;
+            }
+
+            if (params.page == i) {
+              liActive = "active";
+            } else {
+              liActive = "";
+            }
+
+            li += `
+              <li class="page-item  ${liActive}">
+                <a class="page-link" href="javascript:void(0)" onclick="changePage(${
+                  (i)
+                })">${i}</a>
+              </li>
+              `;
+          }
+
+          if (params.page <= params.totalPages) {
+            li += `
         <li class="page-item ${
-          params.page == params.totalPage ? "disabled" : ""
+          params.page == params.totalPages ? "disabled" : ""
         }">
             <a class="page-link" href="javascript:void(0)" onclick="changePage(${
               params.page + 1
             })">Next</a>
         </li>`;
+          }
         document.getElementById("userPagination").innerHTML = li;
       };
 
@@ -429,51 +404,39 @@
 
         tr += `
         <tr>
-          <th> ID </th>
-          <th> String </th>
-          <th> Integer </th>
-          <th> Float </th>
-          <th> Date </th>
-          <th> Boolean </th>
-          <th> Action </th>
-        </tr>
-        `
+        <th> ID </hr>
+        <th>
+            <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('string','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
+               String &nbsp;<i class="fa-solid fa-${params.sortBy == "string" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
+            </a> 
+          </th>
 
-        // tr += `
-        // <tr>
-        // <th> ID </hr>
-        // <th>
-        //     <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('string','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
-        //        String &nbsp;<i class="fa-solid fa-${params.sortBy == "string" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
-        //     </a> 
-        //   </th>
+        <th>  
+            <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('integer','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
+               Integer &nbsp;<i class="fa-solid fa-${params.sortBy == "integer" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
+            </a> 
+            </th>
 
-        // <th>  
-        //     <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('integer','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
-        //        Integer &nbsp;<i class="fa-solid fa-${params.sortBy == "integer" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
-        //     </a> 
-        //     </th>
+        <th>  
+            <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('float','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
+               Float &nbsp;<i class="fa-solid fa-${params.sortBy == "float" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
+            </a> 
+          </th>
 
-        // <th>  
-        //     <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('float','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
-        //        Float &nbsp;<i class="fa-solid fa-${params.sortBy == "float" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
-        //     </a> 
-        //   </th>
+        <th>  
+            <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('date','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
+               Date &nbsp;<i class="fa-solid fa-${params.sortBy == "date" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
+            </a> 
+          </th>
 
-        // <th>  
-        //     <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('date','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
-        //        Date &nbsp;<i class="fa-solid fa-${params.sortBy == "date" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
-        //     </a> 
-        //   </th>
+          <th>  
+            <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('boolean','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
+               Boolean &nbsp;<i class="fa-solid fa-${params.sortBy == "date" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
+            </a> 
+          </th>
 
-        //   <th>  
-        //     <a style="text-decoration: none; color: #000;" href="javascript:void(0)" onclick="changeSort('boolean','${params.sortMode == "asc" ? (sortMode = "desc") : (sortMode = "asc")}')">
-        //        Boolean &nbsp;<i class="fa-solid fa-${params.sortBy == "date" ? params.sortMode == "asc" ? "sort-up" : "sort-down" : "sort"}"></i>
-        //     </a> 
-        //   </th>
-
-        //   <th> Action </hr>
-        // </tr>`;
+          <th> Action </hr>
+        </tr>`;
 
         document.getElementById("users-sort").innerHTML = tr;
       };
